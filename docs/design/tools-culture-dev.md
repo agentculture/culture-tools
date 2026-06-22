@@ -106,9 +106,14 @@ Each milestone is one PR (this repo bumps the version every PR; the
   `scripts/sync-catalog.sh` runs `culture-tools index build` and distributes its
   output → `src/data/catalog.json` (imported, typed) + `public/simple/` (served
   verbatim). Theme is Anthropic-cream, light by default.
-- **M3 — Cloudflare deploy lane.** CF Pages build of `site-astro/` (with the
-  `index build` step wired in), `_worker.js`/`_redirects` as needed, domain bind
-  via `cultureflare`. CI to regenerate the catalog.
+- **M3 — Cloudflare deploy lane.** *In progress.* Deploy provisioned by
+  cultureflare (issue #47): a CF Pages project `tools-culture-dev` (git-integration,
+  option 1 — no secrets) builds `site-astro/` from `main` on push and binds
+  `tools.culture.dev`. **Catalog-refresh CI landed** —
+  `.github/workflows/catalog-refresh.yml` regenerates the committed catalog from
+  live conformance via `index build --repos-dir <cloned siblings>` and opens a PR
+  (human-reviewed before a merge triggers the rebuild). Still open: `_redirects`
+  for a pip-resolvable `/simple/`.
 - **M4 — Polish.** Agent affordances: `llms.txt`, markdown twins, sitemap,
   conformance badges, SEO. (S3 durable tier can land here or later.)
 

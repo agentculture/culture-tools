@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/). This project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.1] - 2026-06-22
+
+### Added
+
+- `index check` / `index build` gain `--repos-dir DIR` — point the conformance
+  gate and introspection at an explicit directory of candidate checkouts instead
+  of the local sibling-checkout layout. This is what lets the catalog be
+  regenerated in CI (where siblings are cloned to a known path), not just from a
+  developer's workspace. The underlying `build()` / `check_*` API already
+  accepted `repos_dir`; this exposes it on the CLI.
+- `.github/workflows/catalog-refresh.yml` — the **M3 catalog-refresh lane**.
+  Scheduled (weekly) + `workflow_dispatch`: clones each candidate repo (sourced
+  from the manifest so it never drifts), installs the `agentfront` auditor,
+  best-effort installs the conformant tools for `learn --json` enrichment,
+  regenerates `catalog.json` + `public/simple/` via `index build --repos-dir`,
+  and **opens a PR** (never commits to `main`) so a human reviews the
+  version/conformance diff before a merge triggers the Cloudflare Pages rebuild.
+  Needs a first `workflow_dispatch` run to validate; private siblings require a
+  `SIBLING_REPOS_TOKEN` secret.
+
 ## [0.5.0] - 2026-06-22
 
 ### Added

@@ -35,6 +35,16 @@ _VERBS = [
 ]
 
 
+def _repos_dir_arg(args: argparse.Namespace) -> Path | None:
+    """Resolve ``--repos-dir`` to a Path, or None for the sibling-checkout default.
+
+    CI clones each candidate tool into one directory and points the gate at it;
+    locally, omitting the flag falls back to the workspace sibling-checkout layout.
+    """
+    value = getattr(args, "repos_dir", None)
+    return Path(value) if value else None
+
+
 def _index_sections() -> list[dict[str, object]]:
     return [
         {"title": "Verbs", "items": list(_VERBS)},
@@ -74,9 +84,10 @@ def cmd_index_check(args: argparse.Namespace) -> int:
             remediation="install it with: uv tool install agentfront",
         )
 
+    repos_dir = _repos_dir_arg(args)
     name = getattr(args, "tool", None)
     if name:
-        verdict = check_named(name)
+        verdict = check_named(name, repos_dir=repos_dir)
         if verdict is None:
             raise CliError(
                 code=EXIT_USER_ERROR,
@@ -85,7 +96,7 @@ def cmd_index_check(args: argparse.Namespace) -> int:
             )
         verdicts = [verdict]
     else:
-        verdicts = check_all()
+        verdicts = check_all(repos_dir=repos_dir)
 
     if json_mode:
         emit_result({"verdicts": [v.to_dict() for v in verdicts]}, json_mode=True)
@@ -116,11 +127,12 @@ def cmd_index_build(args: argparse.Namespace) -> int:
             remediation="install it with: uv tool install agentfront",
         )
     out_dir = Path(getattr(args, "out", None) or _DEFAULT_OUT)
+    repos_dir = _repos_dir_arg(args)
     # In --json mode both streams must stay structured; skip the plain
     # progress line so stderr carries nothing a JSON consumer can't parse.
     if not json_mode:
         emit_diagnostic(f"building index into {out_dir} …")
-    summary = build(out_dir)
+    summary = build(out_dir, repos_dir=repos_dir)
 
     if json_mode:
         emit_result(summary, json_mode=True)
@@ -160,6 +172,10 @@ def register(sub: argparse._SubParsersAction) -> None:
         help="Run the AgentFront conformance gate (all candidates, or one TOOL).",
     )
     ck.add_argument("tool", nargs="?", help="Candidate name; omit to check all.")
+    ck.add_argument(
+        "--repos-dir",
+        help="Directory holding candidate tool checkouts (default: sibling-checkout layout).",
+    )
     ck.add_argument("--json", action="store_true", help="Emit structured JSON.")
     ck.set_defaults(func=cmd_index_check)
 
@@ -171,6 +187,10 @@ def register(sub: argparse._SubParsersAction) -> None:
         "--out",
         default=_DEFAULT_OUT,
         help=f"Output directory (default: {_DEFAULT_OUT}).",
+    )
+    bd.add_argument(
+        "--repos-dir",
+        help="Directory holding candidate tool checkouts (default: sibling-checkout layout).",
     )
     bd.add_argument("--json", action="store_true", help="Emit structured JSON.")
     bd.set_defaults(func=cmd_index_build)
