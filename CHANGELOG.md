@@ -16,9 +16,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   tools + a roadmap section listing pending candidates with the rubric bundles
   each still fails) and per-tool detail pages (install, repo/PyPI links, command
   surface). Conformance badges throughout; light/dark theme toggle.
-- Theme is **Anthropic-cream** (light default — warm `#FFFAF5`, clay accent
-  `#D97706` — with a dark mirror), aligned with the sibling `agentic-human` /
-  `humanic-ai` sites. Catalog-first card-grid layout.
+- Theme is **Anthropic-cream** in light (default — warm `#FFFAF5`, clay accent
+  `#D97706`), aligned with the sibling `agentic-human` / `humanic-ai` sites;
+  **dark mode wears `../katvan`'s terminal green** (`#41d67a`, hover `#7cff9e`)
+  so the two AgentCulture aesthetics meet in one site. Catalog-first card-grid
+  layout; no-flash light/dark toggle.
 - `site-astro/scripts/sync-catalog.sh` (`npm run catalog`) runs
   `culture-tools index build` and distributes its two artifacts into the Astro
   tree: `catalog.json` → `src/data/` (imported, typed via `catalog.ts`) and the

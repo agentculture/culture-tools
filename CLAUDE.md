@@ -195,8 +195,10 @@ Site commands (run inside `site-astro/`): `npm install`, `npm run dev`
 `npm run catalog` (refresh the data).
 
 **Theme:** Anthropic-cream, light by default (warm `#FFFAF5`, clay accent
-`#D97706`) with a dark mirror — palette aligned with the sibling
-`../agentic-human` / `../humanic-ai` sites. The katvan / auntiepypi / cultureflare
+`#D97706`, palette aligned with the sibling `../agentic-human` / `../humanic-ai`
+sites); **dark mode wears `../katvan`'s terminal green** (`#41d67a`). The accent
+is the only token that differs between modes — both swap a single `--accent`
+trio. The katvan / auntiepypi / cultureflare
 siblings supplied the static-Astro structure, the PEP 503 emitter, and the
 Cloudflare deploy path respectively; consult them before extending site infra.
 M3 (Cloudflare deploy lane) and M4 (llms.txt, markdown twins, S3 durable tier)
