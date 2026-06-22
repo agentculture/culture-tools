@@ -14,6 +14,7 @@ Returns a small summary dict (counts + written paths) for the CLI to report.
 from __future__ import annotations
 
 import json
+import shutil
 from pathlib import Path
 
 from culture_tools import __version__
@@ -59,6 +60,12 @@ def build(
     pypi_names = [t.pypi for t in listed_tools]
 
     simple_dir = out_dir / "simple"
+    # Rebuild the tree from clean. A stale per-tool /simple/<name>/ page left by an
+    # earlier build into the same --out would shadow the _redirects rule for that
+    # tool (Cloudflare serves a static asset before applying a redirect), silently
+    # breaking pip-resolvability. Clearing guarantees only the fresh root remains.
+    if simple_dir.exists():
+        shutil.rmtree(simple_dir)
     simple_dir.mkdir(parents=True, exist_ok=True)
     (simple_dir / "index.html").write_text(render_root(pypi_names), encoding="utf-8")
 

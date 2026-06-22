@@ -345,3 +345,22 @@ def test_build_emits_catalog_and_simple_tree(tmp_path) -> None:
     assert "/simple/good-one/   https://pypi.org/simple/good-one/   302" in redirects
     assert "bad-one" not in redirects  # excluded → no redirect rule
     assert summary["redirects"].endswith("_redirects")
+
+
+def test_build_clears_stale_simple_tree(tmp_path) -> None:
+    # A leftover per-tool page from an earlier build into the same --out would
+    # shadow _redirects and break pip-resolvability; build() must rebuild clean.
+    repos = tmp_path / "repos"
+    repos.mkdir()
+    _fake_repo(repos, "good-one")
+    tools = (Tool("good-one", "good-one", "good-one", "agentculture/good-one", "good-one"),)
+    out = tmp_path / "out"
+
+    stale = out / "simple" / "ghost-tool"
+    stale.mkdir(parents=True)
+    (stale / "index.html").write_text("<html>stale</html>", encoding="utf-8")
+
+    build(out, tools=tools, repos_dir=repos, runner=_runner_factory({"good-one"}))
+
+    assert not stale.exists()  # stale per-tool page swept
+    assert (out / "simple" / "index.html").is_file()  # fresh root remains
