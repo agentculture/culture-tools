@@ -42,7 +42,12 @@ export interface Catalog {
   excluded: ExcludedTool[];
 }
 
-export const catalog = catalogJson as unknown as Catalog;
+// A typed import is a compile-time structural guard: if catalog.json drifts from
+// the Catalog interface (a missing/renamed field or wrong type), `astro check` /
+// tsc fails here at build. No runtime validator is shipped, so the zero-runtime-
+// dependency property holds. (Replaces an `as unknown as Catalog` double-cast,
+// which silenced exactly this check — Qodo, PR #3.)
+export const catalog: Catalog = catalogJson;
 export const tools: Tool[] = catalog.tools;
 export const excluded: ExcludedTool[] = catalog.excluded;
 

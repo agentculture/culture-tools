@@ -1,5 +1,5 @@
 {
-  "generated_with": "culture-tools 0.4.0",
+  "generated_with": "culture-tools 0.5.0",
   "contract": "agentfront cli doctor --strict",
   "count": 3,
   "tools": [
@@ -8,7 +8,7 @@
       "pypi": "agentfront",
       "repo": "agentculture/agentfront",
       "homepage": "https://github.com/agentculture/agentfront",
-      "version": "0.10.2",
+      "version": "0.10.1",
       "summary": "Agent First Interface \u2014 scaffold CLI, MCP, and HTTP interfaces for agent-first tools.",
       "purpose": "Generate and verify agent-first interfaces for CLIs (and later MCP + HTTP).",
       "backend": "claude",
@@ -159,7 +159,7 @@
       "pypi": "culture-tools",
       "repo": "agentculture/culture-tools",
       "homepage": "https://github.com/agentculture/culture-tools",
-      "version": "0.4.0",
+      "version": "0.5.0",
       "summary": "tools.culture.dev \u2014 the package index for agent-first CLI tools that conform to the agentfront contract.",
       "purpose": "Clonable scaffold for a new AgentCulture mesh agent.",
       "backend": "colleague",

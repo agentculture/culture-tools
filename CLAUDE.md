@@ -133,6 +133,11 @@ redundant otherwise — don't "simplify" them away:
   `pyproject.toml` version equals `main`'s — even docs/CI-only changes. Use the
   `version-bump` skill (or `/version-bump patch|minor|major`); it updates
   `pyproject.toml` and prepends a Keep-a-Changelog entry to `CHANGELOG.md`.
+  **After bumping, regenerate the committed site catalog** — `cd site-astro &&
+  npm run catalog` — so `catalog.json`'s `generated_with` and the `culture-tools`
+  entry track the new version. `tests/test_site_catalog.py` fails the build if the
+  committed catalog drifts from `pyproject` (it reads committed files only, so it
+  needs neither `uv` nor `agentfront`).
 - **SonarCloud coverage needs repo-relative paths.** `[tool.coverage.run]
   relative_files = true` is set so `coverage.xml` filenames map onto
   `sonar.sources=culture_tools`; without it Sonar silently reports 0% coverage.

@@ -81,16 +81,48 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
           });
         }
 
+        function flashCopied(btn) {
+          var prev = btn.textContent;
+          btn.textContent = 'copied';
+          setTimeout(function () {
+            btn.textContent = prev;
+          }, 1200);
+        }
+        // Fallback for insecure contexts (e.g. http://localhost) and older
+        // browsers where navigator.clipboard is undefined.
+        function legacyCopy(text) {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.setAttribute('readonly', '');
+          ta.style.position = 'fixed';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          var ok = false;
+          try {
+            ok = document.execCommand('copy');
+          } catch (e) {
+            ok = false;
+          }
+          document.body.removeChild(ta);
+          return ok;
+        }
         document.querySelectorAll('[data-copy]').forEach(function (btn) {
           btn.addEventListener('click', function () {
             var text = btn.getAttribute('data-copy') || '';
-            navigator.clipboard.writeText(text).then(function () {
-              var prev = btn.textContent;
-              btn.textContent = 'copied';
-              setTimeout(function () {
-                btn.textContent = prev;
-              }, 1200);
-            });
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(text).then(
+                function () {
+                  flashCopied(btn);
+                },
+                function () {
+                  // Permission denied or API present-but-blocked: degrade.
+                  if (legacyCopy(text)) flashCopied(btn);
+                }
+              );
+            } else if (legacyCopy(text)) {
+              flashCopied(btn);
+            }
           });
         });
       })();
