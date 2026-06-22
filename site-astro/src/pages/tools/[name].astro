@@ -1,0 +1,91 @@
+---
+import Base from '../../layouts/Base.astro';
+import ConformanceBadge from '../../components/ConformanceBadge.astro';
+import { tools } from '../../data/catalog.ts';
+import type { Tool } from '../../data/catalog.ts';
+
+export function getStaticPaths() {
+  return tools.map((tool) => ({
+    params: { name: tool.name },
+    props: { tool },
+  }));
+}
+
+interface Props {
+  tool: Tool;
+}
+
+const { tool } = Astro.props;
+const repoUrl = `https://github.com/${tool.repo}`;
+const pypiUrl = `https://pypi.org/project/${tool.pypi}/`;
+---
+
+<Base title={`${tool.name} — tools.culture.dev`} description={tool.summary || tool.purpose}>
+  <section class="tool-detail container">
+    <a class="back-link" href="/#tools">← all tools</a>
+
+    <div class="tool-detail__head">
+      <h1>{tool.name}</h1>
+      <span class="chip chip--version">v{tool.version || '—'}</span>
+      <ConformanceBadge conformant={tool.conformant} />
+    </div>
+
+    <p class="tool-detail__lede">{tool.summary || tool.purpose}</p>
+
+    <div class="install-block">
+      <code>{tool.install}</code>
+      <button class="copy-btn" type="button" data-copy={tool.install} aria-label="Copy install command">
+        copy
+      </button>
+    </div>
+
+    {
+      tool.purpose && tool.purpose !== tool.summary && (
+        <p class="excluded-note" style="max-width:680px">{tool.purpose}</p>
+      )
+    }
+
+    <div class="tool-detail__grid">
+      <div class="fact">
+        <div class="fact__label">Repository</div>
+        <div class="fact__value"><a href={repoUrl} rel="noopener">{tool.repo}</a></div>
+      </div>
+      <div class="fact">
+        <div class="fact__label">PyPI</div>
+        <div class="fact__value"><a href={pypiUrl} rel="noopener">{tool.pypi}</a></div>
+      </div>
+      <div class="fact">
+        <div class="fact__label">Backend</div>
+        <div class="fact__value">{tool.backend || 'unknown'}</div>
+      </div>
+      <div class="fact">
+        <div class="fact__label">Model</div>
+        <div class="fact__value">{tool.model || 'unknown'}</div>
+      </div>
+    </div>
+
+    {
+      tool.commands.length > 0 && (
+        <>
+          <h2 style="font-size:1.2rem;margin-bottom:0.75rem">Command surface</h2>
+          <table class="cmd-table">
+            <thead>
+              <tr>
+                <th>Command</th>
+                <th>What it does</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tool.commands.map((cmd) => (
+                <tr>
+                  <td class="cmd">{tool.name} {cmd.path.join(' ')}</td>
+                  <td>{cmd.summary}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )
+    }
+  </section>
+</Base>

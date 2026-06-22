@@ -1,0 +1,131 @@
+---
+import '../styles/global.css';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = 'The package index for agent-first CLI tools — every listing certified against the AgentFront contract.',
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap"
+    />
+
+    {/* No-flash theme: apply the saved choice before first paint. Default is light (cream). */}
+    <script is:inline>
+      (function () {
+        try {
+          var saved = localStorage.getItem('theme');
+          if (saved === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <SiteHeader />
+    <main>
+      <slot />
+    </main>
+    <SiteFooter />
+
+    <script is:inline>
+      // Theme toggle + clipboard copy buttons (progressive enhancement).
+      (function () {
+        var root = document.documentElement;
+        var toggle = document.querySelector('.theme-toggle');
+        function setIcon() {
+          if (!toggle) return;
+          toggle.textContent = root.getAttribute('data-theme') === 'dark' ? '☀' : '☾';
+        }
+        setIcon();
+        if (toggle) {
+          toggle.addEventListener('click', function () {
+            var dark = root.getAttribute('data-theme') === 'dark';
+            if (dark) {
+              root.removeAttribute('data-theme');
+            } else {
+              root.setAttribute('data-theme', 'dark');
+            }
+            try {
+              localStorage.setItem('theme', dark ? 'light' : 'dark');
+            } catch (e) {}
+            setIcon();
+          });
+        }
+
+        function flashCopied(btn) {
+          var prev = btn.textContent;
+          btn.textContent = 'copied';
+          setTimeout(function () {
+            btn.textContent = prev;
+          }, 1200);
+        }
+        // Fallback for insecure contexts (e.g. http://localhost) and older
+        // browsers where navigator.clipboard is undefined.
+        function legacyCopy(text) {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.setAttribute('readonly', '');
+          ta.style.position = 'fixed';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          var ok = false;
+          try {
+            ok = document.execCommand('copy');
+          } catch (e) {
+            ok = false;
+          }
+          document.body.removeChild(ta);
+          return ok;
+        }
+        document.querySelectorAll('[data-copy]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var text = btn.getAttribute('data-copy') || '';
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(text).then(
+                function () {
+                  flashCopied(btn);
+                },
+                function () {
+                  // Permission denied or API present-but-blocked: degrade.
+                  if (legacyCopy(text)) flashCopied(btn);
+                }
+              );
+            } else if (legacyCopy(text)) {
+              flashCopied(btn);
+            }
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>

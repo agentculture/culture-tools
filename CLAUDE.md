@@ -133,6 +133,11 @@ redundant otherwise — don't "simplify" them away:
   `pyproject.toml` version equals `main`'s — even docs/CI-only changes. Use the
   `version-bump` skill (or `/version-bump patch|minor|major`); it updates
   `pyproject.toml` and prepends a Keep-a-Changelog entry to `CHANGELOG.md`.
+  **After bumping, regenerate the committed site catalog** — `cd site-astro &&
+  npm run catalog` — so `catalog.json`'s `generated_with` and the `culture-tools`
+  entry track the new version. `tests/test_site_catalog.py` fails the build if the
+  committed catalog drifts from `pyproject` (it reads committed files only, so it
+  needs neither `uv` nor `agentfront`).
 - **SonarCloud coverage needs repo-relative paths.** `[tool.coverage.run]
   relative_files = true` is set so `coverage.xml` filenames map onto
   `sonar.sources=culture_tools`; without it Sonar silently reports 0% coverage.
@@ -171,8 +176,35 @@ re-vendor only the skills you need (`docs/skill-sources.md`).
 
 ## Site build (tools.culture.dev)
 
-The public index site is being built **`../katvan`-style with `../auntiepypi`
-infra, with `../cultureflare` (Cloudflare) help**. Those sibling repos in the
-workspace are the templates/infra references; consult them before adding site
-scaffolding here. (This section is a placeholder pointer — flesh it out as the
-site lands.)
+The public index site lives under **`site-astro/`** — an Astro 6 static site
+(`output: 'static'`, no adapter, so `astro build` emits a pure-static `dist/`
+for Cloudflare Pages). Architecture of record: `docs/design/tools-culture-dev.md`.
+
+**The site renders from one generated file**, `site-astro/src/data/catalog.json`,
+produced by the M1 generator in this package (`culture-tools index build`). The
+data flow is one-way:
+
+```text
+culture-tools index build  →  catalog.json  →  src/data/      (imported, typed via catalog.ts)
+                           →  simple/        →  public/simple/  (static PEP 503, served verbatim)
+```
+
+`site-astro/scripts/sync-catalog.sh` (`npm run catalog`) runs the generator and
+distributes both artifacts. `catalog.json` + `public/simple/` are **committed**
+so the site builds without the Python toolchain; regenerate them against live
+conformance with `npm run catalog` before a deploy. Don't hand-edit
+`catalog.json` — every entry passed `agentfront cli doctor <repo> --strict`.
+
+Site commands (run inside `site-astro/`): `npm install`, `npm run dev`
+(localhost:4321), `npm run build`, `npm run check` (astro type-check),
+`npm run catalog` (refresh the data).
+
+**Theme:** Anthropic-cream, light by default (warm `#FFFAF5`, clay accent
+`#D97706`, palette aligned with the sibling `../agentic-human` / `../humanic-ai`
+sites); **dark mode wears `../katvan`'s terminal green** (`#41d67a`). The accent
+is the only token that differs between modes — both swap a single `--accent`
+trio. The katvan / auntiepypi / cultureflare
+siblings supplied the static-Astro structure, the PEP 503 emitter, and the
+Cloudflare deploy path respectively; consult them before extending site infra.
+M3 (Cloudflare deploy lane) and M4 (llms.txt, markdown twins, S3 durable tier)
+are still ahead — see the design doc's milestones.

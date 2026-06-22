@@ -1,0 +1,7 @@
+# Astro build output + tooling
+dist/
+.astro/
+node_modules/
+
+# npm
+npm-debug.log*

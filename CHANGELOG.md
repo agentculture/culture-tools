@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/). This project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-06-22
+
+### Added
+
+- `site-astro/` — the **tools.culture.dev** front-end (M2). An Astro 6 static
+  site (`output: 'static'`, no adapter → pure-static `dist/` for Cloudflare
+  Pages) that renders from `culture-tools index build`'s `catalog.json`. Pages:
+  a catalog landing (hero + `uv tool install` one-liner + a grid of certified
+  tools + a roadmap section listing pending candidates with the rubric bundles
+  each still fails) and per-tool detail pages (install, repo/PyPI links, command
+  surface). Conformance badges throughout; light/dark theme toggle.
+- Theme is **Anthropic-cream** in light (default — warm `#FFFAF5`, clay accent
+  `#D97706`), aligned with the sibling `agentic-human` / `humanic-ai` sites;
+  **dark mode wears `../katvan`'s terminal green** (`#41d67a`, hover `#7cff9e`)
+  so the two AgentCulture aesthetics meet in one site. Catalog-first card-grid
+  layout; no-flash light/dark toggle.
+- `site-astro/scripts/sync-catalog.sh` (`npm run catalog`) runs
+  `culture-tools index build` and distributes its two artifacts into the Astro
+  tree: `catalog.json` → `src/data/` (imported, typed via `catalog.ts`) and the
+  static PEP 503 `simple/` tree → `public/simple/` (served verbatim).
+  `catalog.json` + `public/simple/` are committed so the site builds without the
+  Python toolchain.
+- Design doc + `CLAUDE.md` site section updated to reflect the landed M2 site
+  (was a placeholder pointer).
+
 ## [0.4.0] - 2026-06-22
 
 ### Added
