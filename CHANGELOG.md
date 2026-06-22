@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/). This project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2026-06-22
+
+### Added
+
+- **pip-resolvable `/simple/` (M4).** `index build` now emits a Cloudflare
+  `_redirects` file mapping each certified tool's `/simple/<name>/` to its PyPI
+  simple page, so `pip install --index-url https://tools.culture.dev/simple/
+  <tool>` resolves a certified tool's real files from PyPI. Only listed tools get
+  a rule, so the index stays curated; uncertified names fall through to 404. The
+  static per-tool `/simple/<name>/` pages are gone — a static asset would shadow
+  the redirect (Cloudflare applies `_redirects` only after an exact asset miss).
+  New `render_redirects()` in `culture_tools.index._simple`; `sync-catalog.sh`
+  and the catalog-refresh CI distribute the file to `public/_redirects`.
+- **Agent affordances on the site (M4):** `/llms.txt` (the agent-facing index,
+  built from the catalog), `/catalog.json` (the machine-readable catalog as a
+  stable endpoint), and **markdown twins** — append `.md` to any page
+  (`/index.md`, `/tools/<name>.md`) for raw-markdown versions. Footer links the
+  new endpoints.
+
 ## [0.5.1] - 2026-06-22
 
 ### Added

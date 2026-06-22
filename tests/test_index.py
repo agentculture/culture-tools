@@ -22,7 +22,7 @@ from culture_tools.index._conformance import (
 )
 from culture_tools.index._introspect import ToolMeta
 from culture_tools.index._manifest import Tool, candidates, find
-from culture_tools.index._simple import normalize, pypi_links, render_project, render_root
+from culture_tools.index._simple import normalize, render_redirects, render_root
 
 # --- conformance parsing --------------------------------------------------
 
@@ -235,11 +235,20 @@ def test_render_root_empty_is_valid() -> None:
     assert "no conformant tools" in html
 
 
-def test_render_project_lists_links() -> None:
-    html = render_project("agtag", pypi_links("agtag"), note="hi")
-    assert "Links for agtag" in html
-    assert "https://pypi.org/project/agtag/" in html
-    assert "<!-- hi -->" in html
+def test_render_redirects_maps_each_tool_to_pypi() -> None:
+    txt = render_redirects(["Culture_Tools", "agentfront"])
+    # normalized, sorted, both trailing-slash forms, 302 to the PyPI simple page
+    assert "/simple/agentfront/   https://pypi.org/simple/agentfront/   302" in txt
+    assert "/simple/agentfront    https://pypi.org/simple/agentfront/   302" in txt
+    assert "/simple/culture-tools/   https://pypi.org/simple/culture-tools/   302" in txt
+    assert txt.index("agentfront/") < txt.index("culture-tools/")  # sorted
+
+
+def test_render_redirects_empty_is_just_a_header() -> None:
+    txt = render_redirects([])
+    rules = [ln for ln in txt.splitlines() if ln.startswith("/simple/")]
+    assert rules == []  # only comment lines, no redirect rules
+    assert txt.startswith("# Generated")
 
 
 # --- catalog assembly (pure) ----------------------------------------------
@@ -327,6 +336,31 @@ def test_build_emits_catalog_and_simple_tree(tmp_path) -> None:
 
     root = (out / "simple" / "index.html").read_text()
     assert 'href="good-one/"' in root
-    assert "bad-one" not in root  # excluded → no simple page
-    assert (out / "simple" / "good-one" / "index.html").is_file()
-    assert not (out / "simple" / "bad-one").exists()
+    assert "bad-one" not in root  # excluded → not in the root listing
+
+    # No static per-tool page — a redirect serves /simple/<name>/ instead.
+    assert not (out / "simple" / "good-one").exists()
+
+    redirects = (out / "_redirects").read_text()
+    assert "/simple/good-one/   https://pypi.org/simple/good-one/   302" in redirects
+    assert "bad-one" not in redirects  # excluded → no redirect rule
+    assert summary["redirects"].endswith("_redirects")
+
+
+def test_build_clears_stale_simple_tree(tmp_path) -> None:
+    # A leftover per-tool page from an earlier build into the same --out would
+    # shadow _redirects and break pip-resolvability; build() must rebuild clean.
+    repos = tmp_path / "repos"
+    repos.mkdir()
+    _fake_repo(repos, "good-one")
+    tools = (Tool("good-one", "good-one", "good-one", "agentculture/good-one", "good-one"),)
+    out = tmp_path / "out"
+
+    stale = out / "simple" / "ghost-tool"
+    stale.mkdir(parents=True)
+    (stale / "index.html").write_text("<html>stale</html>", encoding="utf-8")
+
+    build(out, tools=tools, repos_dir=repos, runner=_runner_factory({"good-one"}))
+
+    assert not stale.exists()  # stale per-tool page swept
+    assert (out / "simple" / "index.html").is_file()  # fresh root remains
