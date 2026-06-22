@@ -26,6 +26,7 @@ buildable/deployable package baseline. Clone it, rename the package, edit
 - `culture-tools overview` — descriptive snapshot of the agent.
 - `culture-tools doctor` — check the agent-identity invariants.
 - `culture-tools cli overview` — describe the CLI surface.
+- `culture-tools index check` — run the AgentFront conformance gate over the tool index.
 
 ## Exit-code policy
 
@@ -115,6 +116,30 @@ itself (distinct from the global `overview`, which describes the agent).
     culture-tools cli overview --json
 """
 
+_INDEX = """\
+# culture-tools index
+
+Certify and catalog agent-first CLI tools for tools.culture.dev. A tool is listed
+**iff** it passes the AgentFront contract — the gate delegates to
+`agentfront cli doctor <repo> --strict` (the canonical seven-bundle rubric) and
+never reimplements it. Non-conformant candidates are reported and excluded.
+
+## Verbs
+
+- `culture-tools index check [TOOL]` — gate every candidate (or one) and report.
+- `culture-tools index build [--out DIR]` — emit `catalog.json` + the static PEP
+  503 `/simple/` tree for the conformant tools (non-conformant ones are recorded
+  under `catalog.json`'s `excluded` roster).
+- `culture-tools index overview` — describe this noun's surface.
+
+## Usage
+
+    culture-tools index check
+    culture-tools index check agentfront --json
+    culture-tools index build --out build/index
+    culture-tools index overview
+"""
+
 
 ENTRIES: dict[tuple[str, ...], str] = {
     (): _ROOT,
@@ -126,4 +151,8 @@ ENTRIES: dict[tuple[str, ...], str] = {
     ("doctor",): _DOCTOR,
     ("cli",): _CLI,
     ("cli", "overview"): _CLI,
+    ("index",): _INDEX,
+    ("index", "check"): _INDEX,
+    ("index", "build"): _INDEX,
+    ("index", "overview"): _INDEX,
 }

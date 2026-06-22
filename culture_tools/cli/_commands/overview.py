@@ -30,6 +30,7 @@ _VERBS = [
     "explain <path> — markdown docs for a topic",
     "overview — this descriptive snapshot",
     "doctor — check the agent-identity invariants",
+    "index check — run the AgentFront conformance gate over the tool index",
 ]
 
 
