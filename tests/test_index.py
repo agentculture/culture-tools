@@ -179,6 +179,40 @@ def test_learn_json_advertises_every_index_verb() -> None:
     assert {("index", "check"), ("index", "build"), ("index", "overview")} <= paths
 
 
+def test_index_check_threads_repos_dir(monkeypatch: pytest.MonkeyPatch) -> None:
+    # CI clones siblings into one dir and passes --repos-dir; it must reach the gate.
+    seen: dict[str, object] = {}
+
+    def fake_check_all(*, repos_dir=None, runner=None):
+        seen["repos_dir"] = repos_dir
+        return []
+
+    monkeypatch.setattr("culture_tools.cli._commands.index.auditor_available", lambda: True)
+    monkeypatch.setattr("culture_tools.cli._commands.index.check_all", fake_check_all)
+    assert main(["index", "check", "--repos-dir", "/tmp/siblings"]) == 0
+    assert str(seen["repos_dir"]) == "/tmp/siblings"
+
+
+def test_index_build_threads_repos_dir(monkeypatch: pytest.MonkeyPatch) -> None:
+    seen: dict[str, object] = {}
+
+    def fake_build(out_dir, **kwargs):
+        seen["repos_dir"] = kwargs.get("repos_dir")
+        return {
+            "out": str(out_dir),
+            "catalog": "c",
+            "simple": "s",
+            "listed": 0,
+            "excluded": 0,
+            "candidates": 0,
+        }
+
+    monkeypatch.setattr("culture_tools.cli._commands.index.auditor_available", lambda: True)
+    monkeypatch.setattr("culture_tools.cli._commands.index.build", fake_build)
+    assert main(["index", "build", "--repos-dir", "/tmp/sib", "--out", "/tmp/o", "--json"]) == 0
+    assert str(seen["repos_dir"]) == "/tmp/sib"
+
+
 # --- PEP 503 emitter (pure) -----------------------------------------------
 
 
