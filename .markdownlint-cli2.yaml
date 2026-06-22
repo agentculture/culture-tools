@@ -15,7 +15,10 @@ config:
     siblings_only: true
 
 ignores:
-  - "node_modules/**"
+  # Matches both the repo-root node_modules and site-astro/node_modules.
+  - "**/node_modules/**"
+  # Astro build output (site-astro/dist) — generated, not authored.
+  - "**/dist/**"
   - ".local/**"
   - ".afi/**"
   - ".teken/**"

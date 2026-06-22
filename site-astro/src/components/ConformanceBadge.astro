@@ -1,0 +1,23 @@
+---
+// A small conformance marker. Listed tools are always conformant (they passed
+// the gate to be in the catalog at all); the component still takes a flag so it
+// can render the negative state on a roadmap/excluded view.
+interface Props {
+  conformant?: boolean;
+  label?: string;
+}
+
+const { conformant = true, label } = Astro.props;
+---
+
+{
+  conformant ? (
+    <span class="badge-ok" title="Passed agentfront cli doctor --strict">
+      ✓ {label ?? 'AgentFront'}
+    </span>
+  ) : (
+    <span class="badge-warn" title="Not yet conformant">
+      ◌ {label ?? 'pending'}
+    </span>
+  )
+}

@@ -1,0 +1,278 @@
+{
+  "generated_with": "culture-tools 0.4.0",
+  "contract": "agentfront cli doctor --strict",
+  "count": 3,
+  "tools": [
+    {
+      "name": "agentfront",
+      "pypi": "agentfront",
+      "repo": "agentculture/agentfront",
+      "homepage": "https://github.com/agentculture/agentfront",
+      "version": "0.10.2",
+      "summary": "Agent First Interface \u2014 scaffold CLI, MCP, and HTTP interfaces for agent-first tools.",
+      "purpose": "Generate and verify agent-first interfaces for CLIs (and later MCP + HTTP).",
+      "backend": "claude",
+      "model": "unknown",
+      "commands": [
+        {
+          "path": [
+            "learn"
+          ],
+          "summary": "Self-teaching prompt."
+        },
+        {
+          "path": [
+            "explain"
+          ],
+          "summary": "Markdown docs by noun/verb path."
+        },
+        {
+          "path": [
+            "overview"
+          ],
+          "summary": "Rollup across interface surfaces."
+        },
+        {
+          "path": [
+            "doctor"
+          ],
+          "summary": "Self-diagnose agentfront's install or audit a target CLI; --fix applies auto-fixable remediations."
+        },
+        {
+          "path": [
+            "cli",
+            "cite"
+          ],
+          "summary": "Emit CLI reference drop."
+        },
+        {
+          "path": [
+            "cli",
+            "doctor"
+          ],
+          "summary": "Audit a CLI against the rubric (replaces `cli verify`)."
+        },
+        {
+          "path": [
+            "cli",
+            "verify"
+          ],
+          "summary": "Deprecated alias for `cli doctor` (removed in v0.6.0)."
+        },
+        {
+          "path": [
+            "cli",
+            "overview"
+          ],
+          "summary": "Read-only snapshot of a target CLI."
+        }
+      ],
+      "install": "uv tool install agentfront",
+      "conformant": true
+    },
+    {
+      "name": "colleague",
+      "pypi": "colleague",
+      "repo": "agentculture/colleague",
+      "homepage": "https://github.com/agentculture/colleague",
+      "version": "1.22.1",
+      "summary": "Colleague is a swappable coder-agent harness that turns different models into repo workers behind one shared task contract.",
+      "purpose": "A swappable coder-agent harness you delegate scoped repo tasks to: it works a model backend through through a bounded tool-loop and returns a JSON run report. A different mind, not a stronger one \u2014 diversity is the point.",
+      "backend": "claude",
+      "model": "unknown",
+      "commands": [
+        {
+          "path": [
+            "work"
+          ],
+          "summary": "Run a repo task through a coder backend."
+        },
+        {
+          "path": [
+            "backends",
+            "list"
+          ],
+          "summary": "List discovered backend plugins."
+        },
+        {
+          "path": [
+            "whoami"
+          ],
+          "summary": "Mesh identity + the live work engine/model."
+        },
+        {
+          "path": [
+            "feedback"
+          ],
+          "summary": "Grade a work item / read its ROI record."
+        },
+        {
+          "path": [
+            "skills",
+            "list"
+          ],
+          "summary": "Show the skill docs resolved for a model."
+        },
+        {
+          "path": [
+            "agents",
+            "list"
+          ],
+          "summary": "Show the AGENTS instructions resolved for a model."
+        },
+        {
+          "path": [
+            "learn"
+          ],
+          "summary": "Self-teaching prompt."
+        },
+        {
+          "path": [
+            "explain"
+          ],
+          "summary": "Markdown docs by path."
+        },
+        {
+          "path": [
+            "overview"
+          ],
+          "summary": "Descriptive snapshot of the agent."
+        },
+        {
+          "path": [
+            "doctor"
+          ],
+          "summary": "Check configuration readiness across all check-groups."
+        },
+        {
+          "path": [
+            "flight"
+          ],
+          "summary": "Pilot a running work item (watch/guide/stop a flight)."
+        }
+      ],
+      "install": "uv tool install colleague",
+      "conformant": true
+    },
+    {
+      "name": "culture-tools",
+      "pypi": "culture-tools",
+      "repo": "agentculture/culture-tools",
+      "homepage": "https://github.com/agentculture/culture-tools",
+      "version": "0.4.0",
+      "summary": "tools.culture.dev \u2014 the package index for agent-first CLI tools that conform to the agentfront contract.",
+      "purpose": "Clonable scaffold for a new AgentCulture mesh agent.",
+      "backend": "colleague",
+      "model": "sakamakismile/Qwen3.6-27B-Text-NVFP4-MTP",
+      "commands": [
+        {
+          "path": [
+            "whoami"
+          ],
+          "summary": "Identity probe from culture.yaml."
+        },
+        {
+          "path": [
+            "learn"
+          ],
+          "summary": "Self-teaching prompt."
+        },
+        {
+          "path": [
+            "explain"
+          ],
+          "summary": "Markdown docs by path."
+        },
+        {
+          "path": [
+            "overview"
+          ],
+          "summary": "Descriptive snapshot of the agent."
+        },
+        {
+          "path": [
+            "doctor"
+          ],
+          "summary": "Check the agent-identity invariants."
+        },
+        {
+          "path": [
+            "cli",
+            "overview"
+          ],
+          "summary": "Describe the CLI surface."
+        },
+        {
+          "path": [
+            "index",
+            "check"
+          ],
+          "summary": "Run the AgentFront conformance gate."
+        },
+        {
+          "path": [
+            "index",
+            "build"
+          ],
+          "summary": "Emit catalog.json + PEP 503 /simple/."
+        },
+        {
+          "path": [
+            "index",
+            "overview"
+          ],
+          "summary": "Describe the index surface."
+        }
+      ],
+      "install": "uv tool install culture-tools",
+      "conformant": true
+    }
+  ],
+  "excluded": [
+    {
+      "name": "agtag",
+      "ran": true,
+      "failing_bundles": [
+        "doctor",
+        "json",
+        "overview"
+      ],
+      "error": ""
+    },
+    {
+      "name": "auntiepypi",
+      "ran": true,
+      "failing_bundles": [
+        "doctor",
+        "json",
+        "overview"
+      ],
+      "error": ""
+    },
+    {
+      "name": "cultureflare",
+      "ran": true,
+      "failing_bundles": [
+        "doctor",
+        "explain",
+        "json",
+        "overview"
+      ],
+      "error": ""
+    },
+    {
+      "name": "devex",
+      "ran": true,
+      "failing_bundles": [
+        "doctor",
+        "errors",
+        "explain",
+        "json",
+        "learnability",
+        "overview",
+        "structure"
+      ],
+      "error": ""
+    }
+  ]
+}

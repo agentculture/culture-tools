@@ -1,0 +1,67 @@
+---
+import Base from '../layouts/Base.astro';
+import ToolCard from '../components/ToolCard.astro';
+import { tools, excluded, catalog } from '../data/catalog.ts';
+
+const installHint = 'uv tool install agentfront';
+---
+
+<Base title="tools.culture.dev — the agent-first tool index">
+  <section class="hero container">
+    <h1>The index for <span class="accent">agent-first</span> CLI tools</h1>
+    <p class="lede">
+      A curated registry of command-line tools built for agents to drive. Every
+      listing is certified against the <strong>AgentFront</strong> contract — no
+      tool appears here until it passes.
+    </p>
+    <div class="install-bar">
+      <code><span class="prompt">$ </span>{installHint}</code>
+      <button class="copy-btn" type="button" data-copy={installHint} aria-label="Copy command">
+        copy
+      </button>
+    </div>
+    <p class="contract-line" id="contract">
+      Membership gate: <code>{catalog.contract}</code>
+    </p>
+  </section>
+
+  <section class="section container" id="tools">
+    <div class="section__head">
+      <h2>Certified tools</h2>
+      <span class="count">{tools.length} listed</span>
+    </div>
+    <div class="tool-grid">
+      {tools.map((tool) => <ToolCard tool={tool} />)}
+    </div>
+  </section>
+
+  {
+    excluded.length > 0 && (
+      <section class="section container" id="roadmap">
+        <div class="section__head">
+          <h2>Candidates not yet conformant</h2>
+          <span class="count">{excluded.length} pending</span>
+        </div>
+        <p class="excluded-note">
+          These tools are on the AgentCulture roadmap but do not yet pass{' '}
+          <code>agentfront cli doctor --strict</code>. Listed here for
+          transparency, with the rubric bundles each still needs to satisfy.
+        </p>
+        <div class="excluded-list">
+          {excluded.map((tool) => (
+            <div class="excluded-row">
+              <span class="excluded-row__name">{tool.name}</span>
+              {tool.ran ? (
+                <span class="excluded-row__bundles">
+                  needs: {tool.failing_bundles.join(', ') || 'see agentfront cli doctor'}
+                </span>
+              ) : (
+                <span class="excluded-row__bundles">could not run: {tool.error}</span>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+    )
+  }
+</Base>

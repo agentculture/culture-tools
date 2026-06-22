@@ -1,0 +1,34 @@
+---
+import ConformanceBadge from './ConformanceBadge.astro';
+import type { Tool } from '../data/catalog.ts';
+
+interface Props {
+  tool: Tool;
+}
+
+const { tool } = Astro.props;
+const href = `/tools/${tool.name}/`;
+---
+
+<article class="tool-card">
+  <a href={href} style="display:contents">
+    <div class="tool-card__top">
+      <span class="tool-card__name">{tool.name}</span>
+      <ConformanceBadge conformant={tool.conformant} />
+    </div>
+    <p class="tool-card__summary">{tool.summary || tool.purpose}</p>
+  </a>
+  <div class="tool-card__meta">
+    <span class="chip chip--version">v{tool.version || '—'}</span>
+    {tool.backend && tool.backend !== 'unknown' && (
+      <span class="chip chip--backend">{tool.backend}</span>
+    )}
+    <span class="chip">{tool.commands.length} verbs</span>
+  </div>
+  <div class="tool-card__install">
+    <code>{tool.install}</code>
+    <button class="copy-btn" type="button" data-copy={tool.install} aria-label="Copy install command">
+      copy
+    </button>
+  </div>
+</article>

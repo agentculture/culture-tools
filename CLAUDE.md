@@ -171,8 +171,33 @@ re-vendor only the skills you need (`docs/skill-sources.md`).
 
 ## Site build (tools.culture.dev)
 
-The public index site is being built **`../katvan`-style with `../auntiepypi`
-infra, with `../cultureflare` (Cloudflare) help**. Those sibling repos in the
-workspace are the templates/infra references; consult them before adding site
-scaffolding here. (This section is a placeholder pointer — flesh it out as the
-site lands.)
+The public index site lives under **`site-astro/`** — an Astro 6 static site
+(`output: 'static'`, no adapter, so `astro build` emits a pure-static `dist/`
+for Cloudflare Pages). Architecture of record: `docs/design/tools-culture-dev.md`.
+
+**The site renders from one generated file**, `site-astro/src/data/catalog.json`,
+produced by the M1 generator in this package (`culture-tools index build`). The
+data flow is one-way:
+
+```text
+culture-tools index build  →  catalog.json  →  src/data/      (imported, typed via catalog.ts)
+                           →  simple/        →  public/simple/  (static PEP 503, served verbatim)
+```
+
+`site-astro/scripts/sync-catalog.sh` (`npm run catalog`) runs the generator and
+distributes both artifacts. `catalog.json` + `public/simple/` are **committed**
+so the site builds without the Python toolchain; regenerate them against live
+conformance with `npm run catalog` before a deploy. Don't hand-edit
+`catalog.json` — every entry passed `agentfront cli doctor <repo> --strict`.
+
+Site commands (run inside `site-astro/`): `npm install`, `npm run dev`
+(localhost:4321), `npm run build`, `npm run check` (astro type-check),
+`npm run catalog` (refresh the data).
+
+**Theme:** Anthropic-cream, light by default (warm `#FFFAF5`, clay accent
+`#D97706`) with a dark mirror — palette aligned with the sibling
+`../agentic-human` / `../humanic-ai` sites. The katvan / auntiepypi / cultureflare
+siblings supplied the static-Astro structure, the PEP 503 emitter, and the
+Cloudflare deploy path respectively; consult them before extending site infra.
+M3 (Cloudflare deploy lane) and M4 (llms.txt, markdown twins, S3 durable tier)
+are still ahead — see the design doc's milestones.
