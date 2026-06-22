@@ -134,6 +134,51 @@ def test_index_explain_resolves(capsys: pytest.CaptureFixture[str]) -> None:
     assert "# culture-tools index" in capsys.readouterr().out
 
 
+def test_index_check_unknown_tool_is_user_error(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # An unknown manifest name is bad *user input* → exit 1, not the env-error 2.
+    monkeypatch.setattr("culture_tools.cli._commands.index.auditor_available", lambda: True)
+    rc = main(["index", "check", "no-such-tool"])
+    assert rc == 1  # EXIT_USER_ERROR
+    err = capsys.readouterr().err
+    assert err.startswith("error:")
+    assert "no candidate tool" in err
+
+
+def test_index_build_diagnostic_respects_json_mode(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    fake = {
+        "out": "o",
+        "catalog": "c",
+        "simple": "s",
+        "listed": 1,
+        "excluded": 0,
+        "candidates": 1,
+    }
+    monkeypatch.setattr("culture_tools.cli._commands.index.auditor_available", lambda: True)
+    monkeypatch.setattr("culture_tools.cli._commands.index.build", lambda out_dir, **kw: fake)
+
+    # text mode: the human progress line lands on stderr
+    assert main(["index", "build"]) == 0
+    cap = capsys.readouterr()
+    assert "building index" in cap.err
+
+    # --json mode: stderr stays clean, stdout is a single JSON object
+    assert main(["index", "build", "--json"]) == 0
+    cap = capsys.readouterr()
+    assert cap.err == ""
+    assert json.loads(cap.out) == fake
+
+
+def test_learn_json_advertises_every_index_verb() -> None:
+    from culture_tools.cli._commands.learn import _as_json_payload
+
+    paths = {tuple(c["path"]) for c in _as_json_payload()["commands"]}
+    assert {("index", "check"), ("index", "build"), ("index", "overview")} <= paths
+
+
 # --- PEP 503 emitter (pure) -----------------------------------------------
 
 

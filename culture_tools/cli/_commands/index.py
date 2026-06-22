@@ -21,7 +21,7 @@ import argparse
 from pathlib import Path
 
 from culture_tools.cli._commands.overview import emit_overview
-from culture_tools.cli._errors import EXIT_ENV_ERROR, CliError
+from culture_tools.cli._errors import EXIT_ENV_ERROR, EXIT_USER_ERROR, CliError
 from culture_tools.cli._output import emit_diagnostic, emit_result
 from culture_tools.index import build, check_all, check_named
 from culture_tools.index._conformance import auditor_available
@@ -79,7 +79,7 @@ def cmd_index_check(args: argparse.Namespace) -> int:
         verdict = check_named(name)
         if verdict is None:
             raise CliError(
-                code=EXIT_ENV_ERROR,
+                code=EXIT_USER_ERROR,
                 message=f"no candidate tool named '{name}' in the manifest",
                 remediation="list candidates with: culture-tools index check",
             )
@@ -116,7 +116,10 @@ def cmd_index_build(args: argparse.Namespace) -> int:
             remediation="install it with: uv tool install agentfront",
         )
     out_dir = Path(getattr(args, "out", None) or _DEFAULT_OUT)
-    emit_diagnostic(f"building index into {out_dir} …")
+    # In --json mode both streams must stay structured; skip the plain
+    # progress line so stderr carries nothing a JSON consumer can't parse.
+    if not json_mode:
+        emit_diagnostic(f"building index into {out_dir} …")
     summary = build(out_dir)
 
     if json_mode:

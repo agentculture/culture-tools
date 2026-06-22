@@ -31,6 +31,7 @@ Commands
   culture-tools cli overview       Describe the CLI surface itself.
   culture-tools index check        Run the AgentFront conformance gate over tools.
   culture-tools index build        Emit catalog.json + static PEP 503 /simple/.
+  culture-tools index overview     Describe the index surface itself.
 
 Machine-readable output
 -----------------------
@@ -63,6 +64,8 @@ def _as_json_payload() -> dict[str, object]:
             {"path": ["doctor"], "summary": "Check the agent-identity invariants."},
             {"path": ["cli", "overview"], "summary": "Describe the CLI surface."},
             {"path": ["index", "check"], "summary": "Run the AgentFront conformance gate."},
+            {"path": ["index", "build"], "summary": "Emit catalog.json + PEP 503 /simple/."},
+            {"path": ["index", "overview"], "summary": "Describe the index surface."},
         ],
         "exit_codes": {
             "0": "success",
