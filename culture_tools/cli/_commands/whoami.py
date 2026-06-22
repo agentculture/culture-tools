@@ -36,21 +36,15 @@ def find_culture_yaml() -> Path | None:
     return None
 
 
-def read_agent_fields() -> dict[str, str]:
-    """Return ``suffix``/``backend``/``model`` from the first agent block.
+def parse_agent_fields(text: str, *, fallback_nick: str = _FALLBACK_NICK) -> dict[str, str]:
+    """Parse ``suffix``/``backend``/``model`` from a ``culture.yaml``'s text.
 
     Parsed without a YAML dependency to keep the runtime deps empty. Reads
     top-level ``key: value`` lines within the first agent entry; anything
-    fancier than the documented shape falls back to the defaults below.
+    fancier than the documented shape falls back to the defaults below. Shared
+    so the index can read *any* tool's ``culture.yaml``, not just this repo's.
     """
-    fields = {"nick": _FALLBACK_NICK, "backend": "unknown", "model": "unknown"}
-    cfg = find_culture_yaml()
-    if cfg is None:
-        return fields
-    try:
-        text = cfg.read_text(encoding="utf-8")
-    except OSError:
-        return fields
+    fields = {"nick": fallback_nick, "backend": "unknown", "model": "unknown"}
     seen_agent = False
     for line in text.splitlines():
         stripped = line.strip()
@@ -64,6 +58,19 @@ def read_agent_fields() -> dict[str, str]:
         elif seen_agent and stripped.startswith("model:"):
             fields["model"] = _scalar(stripped, "model")
     return fields
+
+
+def read_agent_fields() -> dict[str, str]:
+    """Return ``suffix``/``backend``/``model`` from this agent's own culture.yaml."""
+    defaults = {"nick": _FALLBACK_NICK, "backend": "unknown", "model": "unknown"}
+    cfg = find_culture_yaml()
+    if cfg is None:
+        return defaults
+    try:
+        text = cfg.read_text(encoding="utf-8")
+    except OSError:
+        return defaults
+    return parse_agent_fields(text)
 
 
 def _scalar(line: str, key: str) -> str:

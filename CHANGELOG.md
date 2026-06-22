@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/). This project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-06-22
+
+### Added
+
+- `index` noun — the first step of growing this repo into the tools.culture.dev
+  package index. `culture-tools index check [TOOL]` runs the **AgentFront
+  conformance gate** over a candidate manifest: a tool is listed iff
+  `agentfront cli doctor <repo> --strict` reports healthy. The gate delegates to
+  agentfront (the canonical seven-bundle rubric authority) and never
+  reimplements it; non-conformant candidates are reported with their failing
+  bundles and excluded. `index overview` describes the surface; every verb
+  supports `--json`. New package `culture_tools.index` (zero runtime deps).
+- `culture-tools index build [--out DIR]` — emits the two site artifacts:
+  `catalog.json` (built from each conformant tool's own AgentFront metadata —
+  `pyproject.toml` + `culture.yaml` + `learn --json` — with an `excluded` roster
+  for transparency) and a static **PEP 503 `/simple/`** tree (root index +
+  per-tool pages; ported from `../auntiepypi`'s index HTML, links out to PyPI for
+  the actual distributions). These feed the Astro site (M2).
+- `docs/design/tools-culture-dev.md` — architecture of record for the site:
+  catalog + static PEP 503 `/simple/` index, `../katvan`-style Astro front-end,
+  Cloudflare-only hosting for v1 (AWS S3 durable tier deferred), catalog built
+  from AgentFront metadata. Milestones M1–M4.
+
 ## [0.3.4] - 2026-06-20
 
 ### Fixed
