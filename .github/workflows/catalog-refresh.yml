@@ -7,9 +7,15 @@
 # demand) and opens a PR — it never commits to main directly, so a human reviews
 # the version/conformance diff before a merge triggers the CF rebuild.
 #
-# Status: needs a first `workflow_dispatch` run to validate in CI. Private sibling
-# repos require a SIBLING_REPOS_TOKEN secret (a PAT with read access); without it
-# only public siblings clone and the rest are reported as excluded.
+# Status: needs a first `workflow_dispatch` run to validate in CI.
+# Secrets (both optional):
+#   SIBLING_REPOS_TOKEN       read-access PAT to clone *private* siblings; public
+#                             ones clone with the default GITHUB_TOKEN. Without it,
+#                             private siblings are reported as excluded.
+#   CATALOG_REFRESH_PR_TOKEN  write PAT / App token for opening the refresh PR.
+#                             Only needed if you want that PR to trigger CI — PRs
+#                             opened by the default GITHUB_TOKEN do not. Falls back
+#                             to GITHUB_TOKEN (which can still open the PR).
 name: catalog-refresh
 
 on:
@@ -51,6 +57,13 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p _siblings
+          # Keep the token out of clone URLs and the cloned repos' git config: feed
+          # it through GIT_ASKPASS instead, so the URL carries only the
+          # x-access-token *username* (not a secret) and nothing is persisted.
+          askpass="$RUNNER_TEMP/askpass.sh"
+          printf '#!/bin/sh\necho "$GH_TOKEN"\n' > "$askpass"
+          chmod +x "$askpass"
+          export GIT_ASKPASS="$askpass" GIT_TERMINAL_PROMPT=0
           # The manifest is the single source of truth for what to fetch — emit
           # "<owner/repo>\t<dir>" rows so this never drifts from the Python list.
           uv run python - > _siblings/manifest.tsv <<'PY'
@@ -62,7 +75,7 @@ jobs:
             [ -z "${repo:-}" ] && continue
             echo "::group::clone $repo -> _siblings/$dir"
             git clone --depth 1 \
-              "https://x-access-token:${GH_TOKEN}@github.com/${repo}.git" \
+              "https://x-access-token@github.com/${repo}.git" \
               "_siblings/$dir" \
               || echo "skip: could not clone $repo (private/missing) — it will be excluded"
             echo "::endgroup::"
@@ -91,7 +104,12 @@ jobs:
       - name: Open a PR if the catalog changed
         uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ secrets.SIBLING_REPOS_TOKEN || secrets.GITHUB_TOKEN }}
+          # PR creation needs *write*. SIBLING_REPOS_TOKEN is documented read-only
+          # (cloning private siblings), so it must NOT be reused here. The default
+          # GITHUB_TOKEN works via the permissions: block above; note that a PR it
+          # opens does not itself trigger CI — set CATALOG_REFRESH_PR_TOKEN (a PAT
+          # or App token) if you want the refresh PR to run checks automatically.
+          token: ${{ secrets.CATALOG_REFRESH_PR_TOKEN || secrets.GITHUB_TOKEN }}
           base: main
           branch: bot/catalog-refresh
           delete-branch: true
