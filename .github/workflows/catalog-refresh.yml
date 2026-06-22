@@ -99,6 +99,7 @@ jobs:
           cp _stage/catalog.json site-astro/src/data/catalog.json
           rm -rf site-astro/public/simple
           cp -r _stage/simple site-astro/public/simple
+          cp _stage/_redirects site-astro/public/_redirects
           rm -rf _siblings _stage
 
       - name: Open a PR if the catalog changed

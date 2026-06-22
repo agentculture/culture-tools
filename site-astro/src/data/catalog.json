@@ -1,5 +1,5 @@
 {
-  "generated_with": "culture-tools 0.5.1",
+  "generated_with": "culture-tools 0.6.0",
   "contract": "agentfront cli doctor --strict",
   "count": 3,
   "tools": [
@@ -159,7 +159,7 @@
       "pypi": "culture-tools",
       "repo": "agentculture/culture-tools",
       "homepage": "https://github.com/agentculture/culture-tools",
-      "version": "0.5.1",
+      "version": "0.6.0",
       "summary": "tools.culture.dev \u2014 the package index for agent-first CLI tools that conform to the agentfront contract.",
       "purpose": "Clonable scaffold for a new AgentCulture mesh agent.",
       "backend": "colleague",

@@ -114,8 +114,12 @@ Each milestone is one PR (this repo bumps the version every PR; the
   live conformance via `index build --repos-dir <cloned siblings>` and opens a PR
   (human-reviewed before a merge triggers the rebuild). Still open: `_redirects`
   for a pip-resolvable `/simple/`.
-- **M4 — Polish.** Agent affordances: `llms.txt`, markdown twins, sitemap,
-  conformance badges, SEO. (S3 durable tier can land here or later.)
+- **M4 — Polish.** *In progress.* Done: **pip-resolvable `/simple/`** (a
+  Cloudflare `_redirects` file maps each certified tool's `/simple/<name>/` to its
+  PyPI simple page — curated, so only listed tools resolve), **`/llms.txt`**, a
+  **`/catalog.json`** endpoint, and **markdown twins** (`/index.md`,
+  `/tools/<name>.md`). Sitemap shipped in M2. Remaining: conformance badge SVGs,
+  richer SEO, and the S3 durable tier.
 
 ## Open items (deferred, not blocking M1)
 

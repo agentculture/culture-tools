@@ -22,5 +22,6 @@ trap 'rm -rf "$stage"' EXIT
 cp "$stage/catalog.json" "$here/src/data/catalog.json"
 rm -rf "$here/public/simple"
 cp -r "$stage/simple" "$here/public/simple"
+cp "$stage/_redirects" "$here/public/_redirects"
 
-echo "synced: src/data/catalog.json + public/simple/ (from culture-tools index build)"
+echo "synced: src/data/catalog.json + public/simple/ + public/_redirects (from culture-tools index build)"

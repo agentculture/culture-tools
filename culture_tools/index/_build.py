@@ -21,11 +21,7 @@ from culture_tools.index._catalog import build_catalog, build_entry, excluded_re
 from culture_tools.index._conformance import Runner, gate
 from culture_tools.index._introspect import introspect
 from culture_tools.index._manifest import Tool, candidates, default_repos_dir
-from culture_tools.index._simple import normalize, pypi_links, render_project, render_root
-
-_SIMPLE_NOTE = (
-    "Distribution files are served by PyPI; tools.culture.dev certifies the AgentFront contract."
-)
+from culture_tools.index._simple import render_redirects, render_root
 
 
 def build(
@@ -58,23 +54,25 @@ def build(
     catalog_path = out_dir / "catalog.json"
     catalog_path.write_text(json.dumps(catalog, indent=2) + "\n", encoding="utf-8")
 
+    # PEP 503 is keyed by the installable (PyPI) name, and so is pip's request
+    # path — so the root listing and the redirect rules both key on tool.pypi.
+    pypi_names = [t.pypi for t in listed_tools]
+
     simple_dir = out_dir / "simple"
     simple_dir.mkdir(parents=True, exist_ok=True)
-    (simple_dir / "index.html").write_text(
-        render_root([t.name for t in listed_tools]), encoding="utf-8"
-    )
-    for tool in listed_tools:
-        project_dir = simple_dir / normalize(tool.name)
-        project_dir.mkdir(parents=True, exist_ok=True)
-        (project_dir / "index.html").write_text(
-            render_project(tool.name, pypi_links(tool.pypi), note=_SIMPLE_NOTE),
-            encoding="utf-8",
-        )
+    (simple_dir / "index.html").write_text(render_root(pypi_names), encoding="utf-8")
+
+    # pip-resolvability: /simple/<name>/ → PyPI, as a Cloudflare _redirects file at
+    # the site root. No static per-tool page is written — a static asset would
+    # shadow the redirect (Cloudflare applies _redirects only after an asset miss).
+    redirects_path = out_dir / "_redirects"
+    redirects_path.write_text(render_redirects(pypi_names), encoding="utf-8")
 
     return {
         "out": str(out_dir),
         "catalog": str(catalog_path),
         "simple": str(simple_dir),
+        "redirects": str(redirects_path),
         "listed": len(entries),
         "excluded": len(excluded),
         "candidates": len(manifest),
