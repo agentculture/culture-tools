@@ -1,6 +1,6 @@
 [project]
 name = "culture-tools"
-version = "0.6.0"
+version = "0.7.0"
 description = "tools.culture.dev — the package index for agent-first CLI tools that conform to the agentfront contract."
 readme = "README.md"
 license = "Apache-2.0"
