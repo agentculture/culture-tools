@@ -1,5 +1,5 @@
 {
-  "generated_with": "culture-tools 0.6.0",
+  "generated_with": "culture-tools 0.8.0",
   "contract": "agentfront cli doctor --strict",
   "count": 3,
   "tools": [
@@ -8,9 +8,9 @@
       "pypi": "agentfront",
       "repo": "agentculture/agentfront",
       "homepage": "https://github.com/agentculture/agentfront",
-      "version": "0.10.1",
+      "version": "0.20.0",
       "summary": "Agent First Interface \u2014 scaffold CLI, MCP, and HTTP interfaces for agent-first tools.",
-      "purpose": "Generate and verify agent-first interfaces for CLIs (and later MCP + HTTP).",
+      "purpose": "Import agentfront.App to derive agent-first CLI, MCP, and HTTP surfaces from one registry; audit CLIs against the agent-first rubric.",
       "backend": "claude",
       "model": "unknown",
       "commands": [
@@ -37,13 +37,6 @@
             "doctor"
           ],
           "summary": "Self-diagnose agentfront's install or audit a target CLI; --fix applies auto-fixable remediations."
-        },
-        {
-          "path": [
-            "cli",
-            "cite"
-          ],
-          "summary": "Emit CLI reference drop."
         },
         {
           "path": [
@@ -75,7 +68,7 @@
       "pypi": "colleague",
       "repo": "agentculture/colleague",
       "homepage": "https://github.com/agentculture/colleague",
-      "version": "1.22.1",
+      "version": "1.76.0",
       "summary": "Colleague is a swappable coder-agent harness that turns different models into repo workers behind one shared task contract.",
       "purpose": "A swappable coder-agent harness you delegate scoped repo tasks to: it works a model backend through through a bounded tool-loop and returns a JSON run report. A different mind, not a stronger one \u2014 diversity is the point.",
       "backend": "claude",
@@ -86,6 +79,12 @@
             "work"
           ],
           "summary": "Run a repo task through a coder backend."
+        },
+        {
+          "path": [
+            "plan"
+          ],
+          "summary": "Colleague plans a complex task (spec -> plan -> workforce); 'plan continue' resumes an interrupted run without re-asking gates it already resolved."
         },
         {
           "path": [
@@ -149,6 +148,25 @@
             "flight"
           ],
           "summary": "Pilot a running work item (watch/guide/stop a flight)."
+        },
+        {
+          "path": [
+            "session"
+          ],
+          "summary": "Interactive palette: converse, delegate, pilot (agent-native)."
+        },
+        {
+          "path": [
+            "clean"
+          ],
+          "summary": "Reap stale colleague/* branches + artifacts a crashed run left."
+        },
+        {
+          "path": [
+            "lobes",
+            "show"
+          ],
+          "summary": "Show the lobes gateway armed state + resolved cortex/senses roles."
         }
       ],
       "install": "uv tool install colleague",
@@ -159,7 +177,7 @@
       "pypi": "culture-tools",
       "repo": "agentculture/culture-tools",
       "homepage": "https://github.com/agentculture/culture-tools",
-      "version": "0.6.0",
+      "version": "0.8.0",
       "summary": "tools.culture.dev \u2014 the package index for agent-first CLI tools that conform to the agentfront contract.",
       "purpose": "Clonable scaffold for a new AgentCulture mesh agent.",
       "backend": "colleague",
@@ -231,13 +249,9 @@
   "excluded": [
     {
       "name": "agtag",
-      "ran": true,
-      "failing_bundles": [
-        "doctor",
-        "json",
-        "overview"
-      ],
-      "error": ""
+      "ran": false,
+      "failing_bundles": [],
+      "error": "could not parse agentfront output (exit 1)"
     },
     {
       "name": "auntiepypi",
@@ -262,17 +276,9 @@
     },
     {
       "name": "devex",
-      "ran": true,
-      "failing_bundles": [
-        "doctor",
-        "errors",
-        "explain",
-        "json",
-        "learnability",
-        "overview",
-        "structure"
-      ],
-      "error": ""
+      "ran": false,
+      "failing_bundles": [],
+      "error": "could not parse agentfront output (exit 1)"
     }
   ]
 }
